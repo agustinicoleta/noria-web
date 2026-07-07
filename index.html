@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NORIA — Tu empresa girando sola, las 24 horas</title>
+<meta name="description" content="NORIA instala sistemas de agentes de IA en tu PyME: WhatsApp que contesta solo, turnos que se agendan solos, cobranzas que se hacen solas. Con supervisión tuya en lo importante.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Instrument+Sans:ital,wght@0,400..700;1,400&family=Archivo+Mono&display=swap" rel="stylesheet">
+<style>
+  /* ============ TOKENS ============ */
+  :root{
+    --bg:#07080A;
+    --bg-2:#0B0D10;
+    --surface:rgba(255,255,255,.04);
+    --surface-2:rgba(255,255,255,.07);
+    --borde:rgba(244,241,234,.09);
+    --borde-brillo:rgba(244,241,234,.22);
+    --texto:#F4F1EA;
+    --muted:#A9ADA4;
+    --ambar:#E4C589;
+    --ambar-2:#B0833E;
+    --teal:#8AD8E8;
+    --boreal:#5FF0C4;
+    --boreal-2:#7BE6E0;
+    --wa:#143229;
+    --wa-2:#0C2119;
+    --radio:18px;
+    --transicion:.25s cubic-bezier(.2,.7,.3,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  html,body{overflow-x:clip}
+  body{
+    font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--texto);
+    line-height:1.65;-webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--ambar);color:#081113}
+  h1,h2,h3,.display{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;line-height:1.06;letter-spacing:-.015em}
+  .mono{font-family:'Archivo Mono',monospace;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ambar)}
+  a{color:inherit;text-decoration:none}
+  section{padding:110px 24px;position:relative}
+  .wrap{max-width:1140px;margin:0 auto}
+  svg.ic{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+  /* fondo: aurora + grano */
+  .aurora{position:fixed;inset:0;z-index:-2;background:
+    repeating-linear-gradient(90deg, rgba(244,241,234,.012) 0 1px, transparent 1px 90px),
+    repeating-linear-gradient(0deg, rgba(244,241,234,.010) 0 1px, transparent 1px 90px),
+    radial-gradient(50% 40% at 88% -6%, rgba(95,240,196,.10), transparent 62%),
+    radial-gradient(52% 44% at 78% 2%, rgba(138,216,232,.10), transparent 60%),
+    radial-gradient(48% 42% at 4% 8%, rgba(228,197,137,.13), transparent 58%),
+    radial-gradient(40% 38% at 18% 44%, rgba(95,240,196,.05), transparent 60%),
+    radial-gradient(62% 54% at 50% 120%, rgba(228,197,137,.06), transparent 65%),
+    var(--bg)}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.6;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.028 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  /* ============ LIQUID GLASS ============ */
+  .glass{
+    background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.03) 38%, rgba(255,255,255,.05));
+    backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);
+    border:1px solid var(--borde);border-radius:var(--radio);
+    box-shadow:inset 0 1px 0 var(--borde-brillo), 0 24px 60px -28px rgba(0,0,0,.7);
+  }
+  .btn{
+    position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    min-height:52px;padding:14px 30px;border-radius:999px;font-weight:600;font-size:1rem;
+    cursor:pointer;overflow:hidden;transition:transform var(--transicion), box-shadow var(--transicion);
+    border:1px solid var(--borde-brillo);
+    background:linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.05) 45%, rgba(255,255,255,.09));
+    backdrop-filter:blur(14px) saturate(1.5);-webkit-backdrop-filter:blur(14px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35), inset 0 -8px 18px -10px rgba(255,255,255,.14), 0 14px 34px -14px rgba(0,0,0,.65);
+    color:var(--texto);
+  }
+  .btn::before{ /* barrido de luz */
+    content:"";position:absolute;top:0;left:-80%;width:55%;height:100%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent);
+    transform:skewX(-18deg);transition:left .55s ease;
+  }
+  .btn:hover::before{left:125%}
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:scale(.97)}
+  .btn.primaria{
+    background:linear-gradient(160deg, #F6E7C1, #DCB877 42%, #A97F3C);
+    color:#171006;border-color:rgba(248,232,196,.7);
+    box-shadow:inset 0 1px 0 rgba(255,252,240,.65), inset 0 -10px 22px -12px rgba(92,62,14,.6), 0 16px 44px -14px rgba(220,184,119,.4);
+  }
+  .btn.mini{min-height:44px;padding:10px 22px;font-size:.9rem}
+
+  /* ============ NAV ============ */
+  nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:100;width:min(1140px, calc(100% - 28px));border-radius:999px;padding:9px 10px 9px 20px;display:flex;align-items:center;gap:26px}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.28rem;letter-spacing:.04em}
+  .logo svg{width:28px;height:28px}
+  .rueda{animation:girar 16s linear infinite;transform-origin:center}
+  @keyframes girar{to{transform:rotate(360deg)}}
+  .nav-links{display:flex;gap:24px;margin-left:auto;font-size:.92rem;color:var(--muted)}
+  .nav-links a{transition:color var(--transicion);padding:8px 2px}
+  .nav-links a:hover{color:var(--texto)}
+
+  /* ============ HERO ============ */
+  .hero{padding:170px 24px 120px;overflow:hidden}
+  .hero .wrap{display:grid;grid-template-columns:1.12fr .88fr;gap:56px;align-items:center}
+  .kicker{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:8px 16px;font-size:.78rem;color:var(--muted);margin-bottom:28px}
+  .kicker .punto{width:8px;height:8px;border-radius:50%;background:var(--boreal);box-shadow:0 0 12px var(--boreal);animation:latir 2.2s ease-in-out infinite}
+  .kicker .lugar{background:linear-gradient(96deg, var(--boreal), var(--boreal-2) 55%, var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:600;filter:drop-shadow(0 0 10px rgba(95,240,196,.4))}
+  @keyframes latir{50%{opacity:.35}}
+  .hero h1{font-size:clamp(2.7rem,5.6vw,4.6rem);font-weight:700}
+  .hero h1 .grad{background:linear-gradient(92deg, #FBF1D8, #E4C589 44%, #6FE9CF);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .sub{font-size:1.16rem;color:var(--muted);margin:26px 0 36px;max-width:33rem}
+  .hero .sub strong{color:var(--texto)}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .hero .nota{margin-top:20px;font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .noria-hero{position:absolute;right:-190px;top:44%;transform:translateY(-50%);width:660px;height:660px;opacity:.09;pointer-events:none}
+  .noria-hero svg{width:100%;height:100%;animation:girar 70s linear infinite}
+
+  /* chat mockup */
+  .chat{padding:20px;max-width:400px;justify-self:end;transform:rotate(1.4deg);position:relative}
+  .chat-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--borde);margin-bottom:14px}
+  .chat-ava{width:42px;height:42px;border-radius:50%;background:linear-gradient(150deg,#8AD8E8,#39758C);display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;color:#071318}
+  .chat-head small{display:block;color:var(--teal);font-size:.74rem}
+  .bur{max-width:86%;padding:10px 14px;border-radius:14px;font-size:.9rem;margin-bottom:10px;opacity:0;animation:sube .5s ease forwards}
+  .bur.cli{background:rgba(255,255,255,.08);border:1px solid var(--borde);border-bottom-left-radius:4px}
+  .bur.age{background:linear-gradient(160deg,var(--wa),var(--wa-2));border:1px solid rgba(138,216,232,.25);margin-left:auto;border-bottom-right-radius:4px}
+  .bur time{display:block;font-size:.66rem;color:var(--muted);margin-top:4px;text-align:right}
+  .bur:nth-child(2){animation-delay:.5s}.bur:nth-child(3){animation-delay:1.3s}.bur:nth-child(4){animation-delay:2.2s}.bur:nth-child(5){animation-delay:3.1s}
+  @keyframes sube{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .sello{position:absolute;bottom:-20px;left:-16px;padding:10px 16px;border-radius:14px;font-size:.8rem;font-weight:600;transform:rotate(-2.5deg)}
+  .sello b{color:var(--ambar)}
+
+  /* ============ MARQUEE ============ */
+  .cinta{padding:0;border-top:1px solid var(--borde);border-bottom:1px solid var(--borde);background:rgba(255,255,255,.02);overflow:hidden}
+  .cinta-track{display:flex;gap:70px;white-space:nowrap;padding:17px 0;animation:cinta 19s linear infinite;font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;color:var(--muted)}
+  .cinta-track b{color:var(--ambar);font-weight:600}
+  @keyframes cinta{to{transform:translateX(-50%)}}
+
+  /* ============ SECCIONES ============ */
+  .sec-head{max-width:660px;margin-bottom:60px}
+  .sec-head .mono{display:block;margin-bottom:16px}
+  .sec-head h2{font-size:clamp(1.9rem,3.8vw,2.9rem)}
+  .sec-head p{color:var(--muted);margin-top:18px;font-size:1.05rem}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:-30px}
+  .stat{padding:26px 24px;text-align:center}
+  .stat .num{font-family:'Bricolage Grotesque',sans-serif;font-size:2.1rem;font-weight:700;color:var(--ambar)}
+  .stat .lab{font-size:.82rem;color:var(--muted);margin-top:4px}
+
+  /* pasos */
+  .pasos{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .paso{padding:34px 30px;transition:transform var(--transicion), background var(--transicion)}
+  .paso:hover{transform:translateY(-6px);background:linear-gradient(160deg, rgba(255,255,255,.12), rgba(255,255,255,.04) 40%, rgba(255,255,255,.06))}
+  .paso .num{font-family:'Bricolage Grotesque',sans-serif;font-size:.8rem;letter-spacing:.2em;color:var(--teal)}
+  .paso h3{margin:16px 0 10px;font-size:1.3rem}
+  .paso p{font-size:.95rem;color:var(--muted)}
+
+  /* catálogo */
+  .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .prod{padding:28px;position:relative;overflow:hidden;transition:transform var(--transicion), border-color var(--transicion)}
+  .prod:hover{transform:translateY(-6px);border-color:rgba(220,184,119,.45)}
+  .prod .ico{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(150deg, rgba(220,184,119,.2), rgba(220,184,119,.06));border:1px solid rgba(220,184,119,.3);color:var(--ambar);margin-bottom:18px}
+  .prod h3{font-size:1.12rem;margin-bottom:8px}
+  .prod p{font-size:.9rem;color:var(--muted)}
+  .prod .tag{display:inline-block;margin-top:16px;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);background:rgba(138,216,232,.1);border:1px solid rgba(138,216,232,.25);border-radius:999px;padding:5px 12px}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px;justify-content:center}
+  .chip{padding:10px 18px;border-radius:999px;font-size:.85rem;color:var(--muted);border:1px solid var(--borde);background:var(--surface);transition:color var(--transicion), border-color var(--transicion)}
+  .chip:hover{color:var(--texto);border-color:var(--borde-brillo)}
+  .cat-nota{text-align:center;color:var(--muted);font-size:.9rem;margin-top:26px}
+
+  /* comparación */
+  .compara{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .comp{padding:40px}
+  .comp h3{font-size:1.35rem;margin-bottom:22px;display:flex;align-items:center;gap:12px}
+  .comp ul{list-style:none}
+  .comp li{padding:10px 0;font-size:.96rem;color:var(--muted);display:flex;gap:12px;border-bottom:1px dashed var(--borde)}
+  .comp li svg.ic{width:19px;height:19px;margin-top:4px}
+  .comp .precio{font-family:'Bricolage Grotesque',sans-serif;font-size:2.1rem;font-weight:700;margin-top:24px}
+  .comp .precio small{display:block;font-family:'Instrument Sans',sans-serif;font-size:.84rem;font-weight:400;color:var(--muted);margin-top:4px}
+  .comp.noria-card{border-color:rgba(220,184,119,.4);background:linear-gradient(165deg, rgba(220,184,119,.10), rgba(255,255,255,.03) 45%, rgba(138,216,232,.06))}
+  .comp.noria-card .precio{color:var(--ambar)}
+  .comp.noria-card li{color:var(--texto)}
+
+  /* garantía */
+  .gar{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center;padding:52px;border-color:rgba(138,216,232,.35)}
+  .gar svg{width:104px;height:104px;color:var(--teal)}
+  .gar .rueda{animation-duration:26s}
+  .gar h2{font-size:1.9rem;margin-bottom:14px}
+  .gar p{color:var(--muted)}
+  .gar p strong{color:var(--texto)}
+
+  /* planes */
+  .planes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch}
+  .plan{padding:38px 32px;display:flex;flex-direction:column;transition:transform var(--transicion)}
+  .plan:hover{transform:translateY(-6px)}
+  .plan.destacado{border-color:rgba(220,184,119,.5);background:linear-gradient(165deg, rgba(220,184,119,.12), rgba(255,255,255,.04) 50%, rgba(255,255,255,.06));position:relative}
+  .plan .badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(160deg,#F6E7C1,#A97F3C);color:#171006;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:999px;padding:6px 18px;white-space:nowrap}
+  .plan h3{font-size:1.4rem}
+  .plan .para{font-size:.86rem;color:var(--muted);margin:6px 0 22px}
+  .plan .precio{font-family:'Bricolage Grotesque',sans-serif;font-size:2.4rem;font-weight:700;line-height:1}
+  .plan .precio small{display:block;font-family:'Instrument Sans',sans-serif;font-size:.8rem;font-weight:400;color:var(--muted);margin-top:8px}
+  .plan ul{list-style:none;margin:26px 0 32px;flex:1}
+  .plan li{padding:8px 0;font-size:.92rem;color:var(--muted);display:flex;gap:10px}
+  .plan li svg.ic{width:18px;height:18px;color:var(--teal);margin-top:4px}
+  .plan .btn{width:100%}
+  .planes-pre{max-width:720px;margin:0 auto 46px;padding:26px 30px;display:flex;gap:20px;align-items:center}
+  .planes-pre .ico{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:rgba(138,216,232,.12);border:1px solid rgba(138,216,232,.3);color:var(--teal);flex-shrink:0}
+  .planes-pre p{font-size:.94rem;color:var(--muted)}
+  .planes-pre p strong{color:var(--texto)}
+  .planes-nota{text-align:center;margin-top:30px;font-size:.88rem;color:var(--muted)}
+
+  /* fundador */
+  .fundador{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center;padding:48px}
+  .fundador .marco{width:120px;height:120px;border-radius:28px;background:linear-gradient(150deg, rgba(220,184,119,.25), rgba(138,216,232,.15));border:1px solid var(--borde-brillo);display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-size:2.6rem;font-weight:700;color:var(--ambar)}
+  .fundador h2{font-size:1.7rem;margin-bottom:12px}
+  .fundador p{color:var(--muted);max-width:56ch}
+  .fundador p strong{color:var(--texto)}
+
+  /* faq */
+  .faq-wrap{max-width:820px;margin:0 auto}
+  details{border-radius:var(--radio);margin-bottom:12px;overflow:hidden}
+  details summary{cursor:pointer;font-weight:600;font-size:1.02rem;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 26px;min-height:44px}
+  details summary::-webkit-details-marker{display:none}
+  details summary::after{content:"";width:12px;height:12px;border-right:2px solid var(--ambar);border-bottom:2px solid var(--ambar);transform:rotate(45deg);transition:transform var(--transicion);flex-shrink:0}
+  details[open] summary::after{transform:rotate(225deg)}
+  details .resp{padding:0 26px 24px;color:var(--muted);font-size:.96rem;max-width:60ch}
+
+  /* cta final */
+  .final{text-align:center;padding:150px 24px;overflow:hidden}
+  .final .anillo{position:absolute;left:50%;top:-360px;transform:translateX(-50%);width:720px;height:720px;border:1.5px dashed rgba(220,184,119,.18);border-radius:50%;animation:girar 80s linear infinite}
+  .final h2{font-size:clamp(2.2rem,4.6vw,3.5rem);max-width:19ch;margin:0 auto 22px}
+  .final h2 em{font-style:normal;color:var(--ambar)}
+  .final p{color:var(--muted);max-width:46ch;margin:0 auto 42px}
+
+  /* formulario */
+  .form-card{max-width:640px;margin:0 auto;padding:40px;text-align:left}
+  .campo{margin-bottom:18px}
+  .campo label{display:block;font-size:.85rem;font-weight:600;margin-bottom:8px;color:var(--texto)}
+  .campo input,.campo select,.campo textarea{
+    width:100%;min-height:50px;padding:13px 16px;border-radius:13px;font-size:1rem;color:var(--texto);
+    font-family:'Instrument Sans',sans-serif;background:rgba(255,255,255,.05);border:1px solid var(--borde);
+    outline:none;transition:border-color var(--transicion), background var(--transicion);
+  }
+  .campo textarea{min-height:110px;resize:vertical}
+  .campo select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23DCB877' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+  .campo select option{background:var(--bg-2);color:var(--texto)}
+  .campo input:focus,.campo select:focus,.campo textarea:focus{border-color:rgba(220,184,119,.6);background:rgba(255,255,255,.08)}
+  .campo input::placeholder,.campo textarea::placeholder{color:rgba(169,173,164,.6)}
+  .form-ok{display:none;text-align:center;padding:26px;border-radius:13px;border:1px solid rgba(138,216,232,.35);background:rgba(138,216,232,.08);color:var(--texto);font-size:.95rem;margin-top:18px}
+  .form-ok.visible{display:block}
+
+  footer{border-top:1px solid var(--borde);padding:38px 24px;font-size:.85rem;color:var(--muted)}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+
+  /* reveals */
+  .rev{opacity:0;transform:translateY(30px);transition:opacity .7s ease, transform .7s ease}
+  .rev.vista{opacity:1;transform:none}
+  .rev.d1{transition-delay:.08s}.rev.d2{transition-delay:.16s}.rev.d3{transition-delay:.24s}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+    .rev{opacity:1;transform:none}
+    html{scroll-behavior:auto}
+  }
+  @media (max-width:940px){
+    .hero .wrap{grid-template-columns:1fr}
+    .chat{justify-self:start;transform:none;margin-top:10px}
+    .pasos,.cat-grid,.planes,.compara{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .gar,.fundador{grid-template-columns:1fr;text-align:center;justify-items:center}
+    .nav-links{display:none}
+    section{padding:76px 20px}
+    .hero{padding:130px 20px 90px}
+    .noria-hero{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"></div>
+
+<nav class="glass" aria-label="Principal">
+  <a href="#" class="logo" aria-label="NORIA — inicio">
+    <svg viewBox="0 0 100 100" fill="none" stroke="#DCB877" stroke-width="4.5" aria-hidden="true"><g class="rueda"><circle cx="50" cy="50" r="41"/><line x1="50" y1="9" x2="50" y2="91"/><line x1="9" y1="50" x2="91" y2="50"/><line x1="21" y1="21" x2="79" y2="79"/><line x1="79" y1="21" x2="21" y2="79"/></g><circle cx="50" cy="50" r="7" fill="#DCB877" stroke="none"/></svg>
+    NORIA
+  </a>
+  <div class="nav-links">
+    <a href="#como">Cómo funciona</a>
+    <a href="#sistemas">Sistemas</a>
+    <a href="#planes">Planes</a>
+    <a href="#faq">Preguntas</a>
+  </div>
+  <a href="#contacto" class="btn mini primaria" data-plan="Diagnóstico (USD 150)">Pedir diagnóstico</a>
+</nav>
+
+<header class="hero">
+  <div class="noria-hero" aria-hidden="true">
+    <svg viewBox="0 0 100 100" fill="none" stroke="#EDF4F2" stroke-width="1"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="33"/><circle cx="50" cy="50" r="4"/><line x1="50" y1="4" x2="50" y2="96"/><line x1="4" y1="50" x2="96" y2="50"/><line x1="17" y1="17" x2="83" y2="83"/><line x1="83" y1="17" x2="17" y2="83"/><rect x="46" y="1" width="8" height="7" rx="1.5"/><rect x="46" y="92" width="8" height="7" rx="1.5"/><rect x="1" y="46" width="7" height="8" rx="1.5"/><rect x="92" y="46" width="7" height="8" rx="1.5"/></svg>
+  </div>
+  <div class="wrap">
+    <div>
+      <span class="kicker glass"><span class="punto"></span>Agentic as a Service</span>
+      <h1>Tu empresa girando <span class="grad">sola</span>, las 24 horas.</h1>
+      <p class="sub">NORIA instala <strong>sistemas de agentes de IA</strong> en tu negocio: el WhatsApp contesta solo, los turnos se agendan solos, las cobranzas se hacen solas. <strong>Vos aprobás lo importante</strong> y mirás el resumen a la noche.</p>
+      <div class="cta-row">
+        <a href="#contacto" class="btn primaria" data-plan="Diagnóstico (USD 150)">Pedir un diagnóstico
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#como" class="btn">Ver cómo funciona</a>
+      </div>
+      <p class="nota">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width:17px;height:17px;color:var(--teal)"><path d="M20 6L9 17l-5-5"/></svg>
+        Diagnóstico con números de TU negocio · garantía de piloto 30 días · sin permanencia
+      </p>
+    </div>
+
+    <div class="chat glass" role="img" aria-label="Conversación de WhatsApp respondida automáticamente a las 2:47 de la madrugada">
+      <div class="chat-head">
+        <div class="chat-ava">P</div>
+        <div>
+          <strong>Pizzería Don Atilio</strong>
+          <small>● Sistema NORIA activo — responde en segundos</small>
+        </div>
+      </div>
+      <div class="bur cli">Hola! ¿Tenés lugar para 6 mañana a las 21?<time>02:46</time></div>
+      <div class="bur age">¡Hola! Sí, tenemos mesa para 6 mañana 21:00. ¿La reservo a tu nombre?<time>02:46</time></div>
+      <div class="bur cli">Sí! Laura. Somos 2 celíacos, ¿tienen opciones?<time>02:47</time></div>
+      <div class="bur age">Listo Laura, mesa para 6 reservada ✓ Tenemos pizzas sin TACC: muzza, napolitana y fugazzeta. ¡Te esperamos mañana 21:00!<time>02:47</time></div>
+      <div class="sello glass">Respondido a las <b>2:47 AM</b> — sin despertar a nadie</div>
+    </div>
+  </div>
+</header>
+
+<div class="cinta" aria-hidden="true">
+  <div class="cinta-track">
+    <span>47 mensajes sin contestar <b>→ ventas perdidas</b></span>
+    <span>turnos que se pisan <b>→ clientes que no vuelven</b></span>
+    <span>cobrarle al que te debe <b>→ incomodísimo</b></span>
+    <span>contestar a las 11 de la noche <b>→ tu vida</b></span>
+    <span>47 mensajes sin contestar <b>→ ventas perdidas</b></span>
+    <span>turnos que se pisan <b>→ clientes que no vuelven</b></span>
+    <span>cobrarle al que te debe <b>→ incomodísimo</b></span>
+    <span>contestar a las 11 de la noche <b>→ tu vida</b></span>
+  </div>
+</div>
+
+<section style="padding-top:80px;padding-bottom:40px">
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat glass rev"><div class="num">24/7</div><div class="lab">Atención sin horario ni feriados</div></div>
+      <div class="stat glass rev d1"><div class="num">&lt;10 seg</div><div class="lab">Tiempo de respuesta típico</div></div>
+      <div class="stat glass rev d2"><div class="num">50×</div><div class="lab">Conversaciones atendidas a la vez</div></div>
+      <div class="stat glass rev d3"><div class="num">18</div><div class="lab">Sistemas listos en catálogo</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="como">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <span class="mono">Cómo funciona</span>
+      <h2>No vendemos inteligencia artificial. Instalamos procesos que giran solos.</h2>
+      <p>Un sistema NORIA es un equipo de agentes de IA configurado para TU negocio — tus precios, tu tono, tus reglas — conectado a las herramientas que ya usás. Nada importante sale sin tu aprobación.</p>
+    </div>
+    <div class="pasos">
+      <div class="paso glass rev">
+        <span class="num">PASO 01</span>
+        <h3>Diagnóstico</h3>
+        <p>Relevamos tus procesos: dónde se pierde tiempo, dónde se escapa plata. Te entregamos un plan con números reales: qué automatizar, cuánto ahorra, cuánto cuesta.</p>
+      </div>
+      <div class="paso glass rev d1">
+        <span class="num">PASO 02</span>
+        <h3>Instalación</h3>
+        <p>Armamos tu sistema y lo conectamos a lo que ya usás: WhatsApp, Mercado Pago, tu agenda, tus planillas. La primera semana ves todo lo que responde antes de soltarle la mano.</p>
+      </div>
+      <div class="paso glass rev d2">
+        <span class="num">PASO 03</span>
+        <h3>La noria gira</h3>
+        <p>El sistema trabaja 24/7 y nosotros lo mantenemos girando: mejoras mensuales, soporte real y un reporte claro de lo que hizo por vos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sistemas" style="background:rgba(255,255,255,.015);border-top:1px solid var(--borde);border-bottom:1px solid var(--borde)">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <span class="mono">El catálogo — 18 sistemas</span>
+      <h2>Listos para tu rubro, adaptados a tu negocio en días</h2>
+      <p>Estos son los seis más pedidos. Cada uno se configura con tus precios, tu tono y tus reglas.</p>
+    </div>
+    <div class="cat-grid">
+      <div class="prod glass rev">
+        <div class="ico"><svg class="ic" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-9.9 8.26L4 21l1.24-4.1A8.5 8.5 0 1121 11.5z"/></svg></div>
+        <h3>Recepcionista WhatsApp</h3>
+        <p>Contesta consultas, da precios y horarios, deriva a un humano cuando corresponde. 24/7, en segundos, con tu tono.</p>
+        <span class="tag">Todos los rubros</span>
+      </div>
+      <div class="prod glass rev d1">
+        <div class="ico"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <h3>Gestor de Turnos</h3>
+        <p>Agenda, confirma, recuerda y reagenda solo. Llena los huecos con lista de espera y baja los no-shows.</p>
+        <span class="tag">Salud · Estética · Servicios</span>
+      </div>
+      <div class="prod glass rev d2">
+        <div class="ico"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <h3>Cobrador Inteligente</h3>
+        <p>Detecta facturas vencidas y recuerda con firmeza cordial. El link de pago va en el mensaje.</p>
+        <span class="tag">Servicios · B2B · Cuotas</span>
+      </div>
+      <div class="prod glass rev">
+        <div class="ico"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 15h6M9 11h2"/></svg></div>
+        <h3>Presupuestador Express</h3>
+        <p>Recibe el pedido, calcula con tu lista de precios y manda el presupuesto prolijo en minutos. Después lo persigue.</p>
+        <span class="tag">Talleres · Oficios · Gráficas</span>
+      </div>
+      <div class="prod glass rev d1">
+        <div class="ico"><svg class="ic" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v9"/></svg></div>
+        <h3>Gestor de Stock</h3>
+        <p>Avisa antes del quiebre, sugiere reposición por historial y deja armado el pedido al proveedor.</p>
+        <span class="tag">Comercio · Gastronomía</span>
+      </div>
+      <div class="prod glass rev d2">
+        <div class="ico"><svg class="ic" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 3 5-6"/></svg></div>
+        <h3>Tablero Gerencial</h3>
+        <p>Ventas, caja, deudas y stock en un reporte diario por WhatsApp. Tu negocio en un vistazo, con alertas.</p>
+        <span class="tag">Todos los rubros</span>
+      </div>
+    </div>
+    <div class="chips rev">
+      <span class="chip">Vendedor de Catálogo</span><span class="chip">Recuperador de Carritos</span><span class="chip">Cazador de Leads</span><span class="chip">Seguimiento Postventa</span><span class="chip">Gestor de Reseñas</span><span class="chip">Gestor de Reclamos</span><span class="chip">Marketing Automático</span><span class="chip">Asistente de Facturación</span><span class="chip">Conciliador de Pagos</span><span class="chip">Gestor de Proveedores</span><span class="chip">Onboarding de Empleados</span><span class="chip">Analista de Precios</span>
+    </div>
+    <p class="cat-nota rev">¿Tu proceso no está acá? Los sistemas también se diseñan a medida.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head rev">
+      <span class="mono">La cuenta que importa</span>
+      <h2>Menos que medio empleado. Trabajando el triple.</h2>
+    </div>
+    <div class="compara">
+      <div class="comp glass rev">
+        <h3><svg class="ic" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Un administrativo más</h3>
+        <ul>
+          <li><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Trabaja 8 horas, 5 días a la semana</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>Vacaciones, licencias, aguinaldo, cargas</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>Se satura en hora pico</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>A las 2 AM duerme (con razón)</li>
+        </ul>
+        <div class="precio">$2.300.000+<small>por mes con cargas — y es UNA persona</small></div>
+      </div>
+      <div class="comp glass noria-card rev d1">
+        <h3><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18"/></svg>Un sistema NORIA</h3>
+        <ul>
+          <li><svg class="ic" viewBox="0 0 24 24" style="color:var(--teal)"><path d="M20 6L9 17l-5-5"/></svg>Trabaja 24/7, los 365 días</li>
+          <li><svg class="ic" viewBox="0 0 24 24" style="color:var(--teal)"><path d="M20 6L9 17l-5-5"/></svg>Responde en segundos, sin pila de pendientes</li>
+          <li><svg class="ic" viewBox="0 0 24 24" style="color:var(--teal)"><path d="M20 6L9 17l-5-5"/></svg>Atiende 50 conversaciones a la vez</li>
+          <li><svg class="ic" viewBox="0 0 24 24" style="color:var(--teal)"><path d="M20 6L9 17l-5-5"/></svg>Lo importante siempre pasa por vos</li>
+        </ul>
+        <div class="precio">Desde USD 120<small>por mes — mantenimiento y mejoras incluidas</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="gar glass rev">
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><g class="rueda"><circle cx="50" cy="50" r="43"/><line x1="50" y1="7" x2="50" y2="93"/><line x1="7" y1="50" x2="93" y2="50"/><line x1="20" y1="20" x2="80" y2="80"/><line x1="80" y1="20" x2="20" y2="80"/></g><circle cx="50" cy="50" r="6" fill="currentColor" stroke="none"/></svg>
+      <div>
+        <h2>Piloto de 30 días con métrica firmada. El riesgo lo corremos nosotros.</h2>
+        <p>Antes de arrancar definimos juntos <strong>el número que tiene que mejorar</strong> — "responder el 90% de las consultas en menos de un minuto", "recuperar 3 de cada 10 presupuestos dormidos" — y se mide desde el día uno, con reporte que ves vos. <strong>Si a los 30 días no se cumple: seguimos sin cobrarte el mensual hasta cumplirla, o te devolvemos lo pagado del piloto.</strong> Sin permanencia: cualquier plan se da de baja con 30 días de aviso, y tus datos y cuentas son tuyos, siempre.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="planes">
+  <div class="wrap">
+    <div class="sec-head rev">
+      <span class="mono">Planes</span>
+      <h2>Precios claros, sin sorpresas</h2>
+      <p>Cotizados en dólares para no renegociar cada tres meses; se abonan en pesos al cambio del día, con factura.</p>
+    </div>
+
+    <div class="planes-pre glass rev">
+      <div class="ico"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></div>
+      <p><strong>El primer paso siempre es el Diagnóstico — USD 150.</strong> Relevamos tu negocio y te entregamos los 3 procesos más rentables de automatizar, con su retorno estimado en números tuyos. Se descuenta completo si avanzás dentro de los 30 días.</p>
+    </div>
+
+    <div class="planes">
+      <div class="plan glass rev">
+        <h3>Atiende</h3>
+        <p class="para">Para dejar de perder ventas por no contestar</p>
+        <div class="precio">USD 500<small>de instalación + USD 120/mes</small></div>
+        <ul>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>1 sistema del catálogo configurado con tu negocio</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Hasta 500 conversaciones por mes</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Capacitación para vos y tu equipo</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Reporte semanal + mejoras mensuales</li>
+        </ul>
+        <a href="#contacto" class="btn" data-plan="Plan Atiende">Empezar</a>
+      </div>
+      <div class="plan glass destacado rev d1">
+        <span class="badge">El más elegido</span>
+        <h3>Opera</h3>
+        <p class="para">Para sacarte de encima la operación diaria</p>
+        <div class="precio">USD 1.500<small>de instalación + USD 300/mes</small></div>
+        <ul>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Hasta 3 sistemas trabajando coordinados</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Mercado Pago: cobrás dentro del chat</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Hasta 1.500 conversaciones por mes</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Reporte diario + soporte prioritario</li>
+        </ul>
+        <a href="#contacto" class="btn primaria" data-plan="Plan Opera">Quiero este</a>
+      </div>
+      <div class="plan glass rev d2">
+        <h3>Escala</h3>
+        <p class="para">Para operar como una empresa grande</p>
+        <div class="precio">USD 3.500+<small>de instalación + USD 700/mes</small></div>
+        <ul>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Sistema integral a medida, multi-área</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Tablero gerencial + todas las integraciones</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Hasta 5.000 conversaciones por mes</li>
+          <li><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Acompañamiento tipo socio tecnológico</li>
+        </ul>
+        <a href="#contacto" class="btn" data-plan="Plan Escala">Hablemos</a>
+      </div>
+    </div>
+    <p class="planes-nota rev">Todos los planes: sin permanencia · factura · tus datos son tuyos · garantía de piloto 30 días.</p>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="fundador glass rev">
+      <div class="marco" aria-hidden="true">A</div>
+      <div>
+        <span class="mono" style="display:block;margin-bottom:10px">Quién está detrás</span>
+        <h2>La generación que creció con la IA, trabajando para tu negocio.</h2>
+        <p>NORIA la fundó <strong>Agustín Gurovitz</strong> en Buenos Aires con una convicción simple: las PyMEs argentinas se merecen la misma tecnología que las empresas grandes, <strong>sin humo y sin letra chica</strong>. Por eso cada propuesta lleva números verificables, cada sistema se entrega con garantía por escrito, y nada importante se automatiza sin tu aprobación. No te pedimos que confíes: te pedimos que mires la demo con tus propios datos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:40px">
+  <div class="wrap">
+    <div class="sec-head rev" style="margin-left:auto;margin-right:auto;text-align:center;max-width:720px">
+      <span class="mono">Preguntas frecuentes</span>
+      <h2>Lo que todos preguntan (con razón)</h2>
+    </div>
+    <div class="faq-wrap rev">
+      <details class="glass">
+        <summary>¿Y si la IA le contesta cualquier cosa a un cliente?</summary>
+        <p class="resp">El sistema solo responde sobre lo que sabe de tu negocio: tus precios, tus horarios, tus políticas. Cuando algo se sale de eso — una queja delicada, un pedido raro — no inventa: te lo deriva con el contexto completo. Y antes de entregarlo lo sometemos a pruebas de casos límite para que no se salga del libreto.</p>
+      </details>
+      <details class="glass">
+        <summary>¿Mis clientes se van a dar cuenta de que hablan con una IA?</summary>
+        <p class="resp">El sistema habla con el tono de tu negocio y no esconde lo que es si le preguntan. Lo que tus clientes más notan no es la IA: es que por fin alguien les contesta en segundos, a cualquier hora.</p>
+      </details>
+      <details class="glass">
+        <summary>¿Qué pasa si se corta internet o falla algo?</summary>
+        <p class="resp">Los sistemas corren en servidores monitoreados con alertas automáticas: si algo falla, nos enteramos nosotros antes que vos. WhatsApp guarda los mensajes; cuando el sistema vuelve, responde lo pendiente. Y tu WhatsApp sigue siendo tuyo: en el peor caso atendés como siempre.</p>
+      </details>
+      <details class="glass">
+        <summary>¿Esto no lo hace cualquiera con ChatGPT?</summary>
+        <p class="resp">Probar, cualquiera prueba. La diferencia está en conectarlo de verdad a tu agenda, tus pagos y tu stock, ponerle límites para que no prometa cualquier cosa, y mantenerlo cuando tu negocio cambia. Pagás por un sistema que funciona en 6 meses igual que el día uno — y por alguien responsable si no.</p>
+      </details>
+      <details class="glass">
+        <summary>¿En cuánto tiempo está funcionando?</summary>
+        <p class="resp">Un sistema del catálogo: 5 a 10 días desde el kickoff. Sistemas multi-área: 3 a 6 semanas. Siempre arranca en modo supervisado: los primeros días ves todo lo que responde antes de soltarle la mano.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="final" id="contacto">
+  <div class="anillo" aria-hidden="true"></div>
+  <h2>Mientras leías esto, tu WhatsApp <em>siguió sonando</em>.</h2>
+  <p>Contanos de tu negocio y te respondemos con el primer paso: el diagnóstico con números tuyos.</p>
+
+  <form class="form-card glass" id="form-contacto" novalidate>
+    <div class="campo">
+      <label for="f-nombre">Tu nombre *</label>
+      <input id="f-nombre" name="nombre" type="text" placeholder="Norma" autocomplete="name" required>
+    </div>
+    <div class="campo">
+      <label for="f-negocio">Tu negocio y rubro *</label>
+      <input id="f-negocio" name="negocio" type="text" placeholder="Estética Lumen — centro de estética en Caballito" required>
+    </div>
+    <div class="campo">
+      <label for="f-whatsapp">Tu WhatsApp *</label>
+      <input id="f-whatsapp" name="whatsapp" type="tel" inputmode="tel" placeholder="11 5555 5555" autocomplete="tel" required>
+    </div>
+    <div class="campo">
+      <label for="f-interes">Qué te interesa</label>
+      <select id="f-interes" name="interes">
+        <option value="Diagnóstico (USD 150)" selected>Diagnóstico — quiero saber qué automatizar (USD 150)</option>
+        <option value="Plan Atiende">Plan Atiende — que el WhatsApp conteste solo</option>
+        <option value="Plan Opera">Plan Opera — sacarme de encima la operación</option>
+        <option value="Plan Escala">Plan Escala — sistema integral a medida</option>
+        <option value="Un sistema puntual">Un sistema puntual del catálogo</option>
+        <option value="Todavía no sé">Todavía no sé — quiero ver una demo</option>
+      </select>
+    </div>
+    <div class="campo">
+      <label for="f-mensaje">Contanos tu dolor de cabeza (opcional)</label>
+      <textarea id="f-mensaje" name="mensaje" placeholder="Ej: se me acumulan 40 mensajes por día y los contesto a la noche…"></textarea>
+    </div>
+    <button type="submit" class="btn primaria" id="f-enviar" style="width:100%">Enviar consulta
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+    <div class="form-ok" id="form-ok" role="status" aria-live="polite">
+      ✓ ¡Listo! Se abrió tu aplicación de correo con la consulta armada — tocá enviar y te respondemos dentro del día.
+    </div>
+  </form>
+  <p style="margin-top:24px;font-size:.85rem;opacity:.6">Respondemos dentro del día. Sin spam, sin compromiso.</p>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="#" class="logo" style="font-size:1.05rem">
+      <svg viewBox="0 0 100 100" fill="none" stroke="#DCB877" stroke-width="4.5" style="width:22px;height:22px" aria-hidden="true"><g class="rueda"><circle cx="50" cy="50" r="41"/><line x1="50" y1="9" x2="50" y2="91"/><line x1="9" y1="50" x2="91" y2="50"/><line x1="21" y1="21" x2="79" y2="79"/><line x1="79" y1="21" x2="21" y2="79"/></g><circle cx="50" cy="50" r="7" fill="#DCB877" stroke="none"/></svg>
+      NORIA
+    </a>
+    <p>Agentic as a Service · © 2026 NORIA — Tu empresa girando sola.</p>
+  </div>
+</footer>
+
+<script>
+  /* ===== CONFIGURACIÓN DE CONTACTO =====
+     Cuando NORIA tenga su número de WhatsApp Business, completá WHATSAPP con
+     formato internacional sin + ni espacios (ej: "5491155555555") y el formulario
+     pasa a abrir WhatsApp automáticamente en vez del correo. */
+  const WHATSAPP = "";
+  const EMAIL = "agustinicoleta2@gmail.com";
+
+  /* Reveals al scrollear */
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('vista'); io.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.rev').forEach(el=>io.observe(el));
+
+  const form = document.getElementById('form-contacto');
+  const selInteres = document.getElementById('f-interes');
+  const txtMensaje = document.getElementById('f-mensaje');
+
+  /* Botones de planes: precargan el plan elegido en el formulario */
+  document.querySelectorAll('[data-plan]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const val = btn.getAttribute('data-plan');
+      [...selInteres.options].forEach(o=>{ if(o.value===val) selInteres.value = val; });
+    });
+  });
+
+  /* Catálogo: cards y chips clickeables → precargan la consulta y llevan al formulario */
+  function elegirSistema(nombre){
+    selInteres.value = "Un sistema puntual";
+    txtMensaje.value = "Me interesa el sistema: " + nombre + ".";
+    document.getElementById('contacto').scrollIntoView({behavior:'smooth'});
+  }
+  document.querySelectorAll('.prod').forEach(card=>{
+    card.style.cursor = 'pointer';
+    card.setAttribute('role','button');
+    card.setAttribute('tabindex','0');
+    const nombre = card.querySelector('h3').textContent;
+    card.setAttribute('aria-label','Consultar por ' + nombre);
+    card.addEventListener('click', ()=>elegirSistema(nombre));
+    card.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); elegirSistema(nombre);} });
+  });
+  document.querySelectorAll('.chip').forEach(chip=>{
+    chip.style.cursor = 'pointer';
+    chip.setAttribute('role','button');
+    chip.setAttribute('tabindex','0');
+    chip.addEventListener('click', ()=>elegirSistema(chip.textContent.trim()));
+    chip.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); elegirSistema(chip.textContent.trim());} });
+  });
+
+  /* Envío del formulario: WhatsApp si está configurado, si no correo */
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const nombre = document.getElementById('f-nombre');
+    const negocio = document.getElementById('f-negocio');
+    const wsp = document.getElementById('f-whatsapp');
+    let primerError = null;
+    [nombre, negocio, wsp].forEach(c=>{
+      c.style.borderColor = '';
+      if(!c.value.trim()){ c.style.borderColor = 'rgba(232,110,110,.8)'; if(!primerError) primerError = c; }
+    });
+    if(primerError){ primerError.focus(); return; }
+
+    const texto = "Hola NORIA! Soy " + nombre.value.trim() +
+      ", de " + negocio.value.trim() +
+      ". Mi WhatsApp: " + wsp.value.trim() +
+      ". Me interesa: " + selInteres.value + "." +
+      (txtMensaje.value.trim() ? " Mi situación: " + txtMensaje.value.trim() : "");
+
+    const btn = document.getElementById('f-enviar');
+    btn.textContent = 'Abriendo…';
+
+    if(WHATSAPP){
+      window.open('https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(texto), '_blank');
+      document.getElementById('form-ok').textContent = '✓ ¡Listo! Se abrió WhatsApp con tu consulta armada — tocá enviar y te respondemos dentro del día.';
+    } else {
+      window.location.href = 'mailto:' + EMAIL +
+        '?subject=' + encodeURIComponent('Consulta NORIA — ' + selInteres.value) +
+        '&body=' + encodeURIComponent(texto);
+    }
+    document.getElementById('form-ok').classList.add('visible');
+    setTimeout(()=>{ btn.innerHTML = 'Enviar consulta <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'; }, 1600);
+  });
+</script>
+</body>
+</html>
