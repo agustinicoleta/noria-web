@@ -30,7 +30,10 @@
     --transicion:.25s cubic-bezier(.2,.7,.3,1);
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;scroll-padding-top:96px}
+  /* Accesibilidad de teclado (checklist ui-ux-pro-max): foco visible en oro */
+  :focus-visible{outline:2px solid var(--ambar);outline-offset:3px;border-radius:8px}
+  a,button,summary{cursor:pointer}
   html,body{overflow-x:clip}
   body{
     font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--texto);
@@ -149,16 +152,25 @@
 
   /* pasos */
   .pasos{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  .paso{padding:34px 30px;transition:transform var(--transicion), background var(--transicion)}
+  .paso{padding:34px 30px;position:relative;overflow:hidden;transition:transform .45s cubic-bezier(.22,1,.36,1), background .45s cubic-bezier(.22,1,.36,1)}
   .paso:hover{transform:translateY(-6px);background:linear-gradient(160deg, rgba(255,255,255,.12), rgba(255,255,255,.04) 40%, rgba(255,255,255,.06))}
+  .paso::before{content:"";position:absolute;top:0;left:-75%;width:55%;height:100%;transform:skewX(-18deg);
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.08), transparent);
+    transition:left .65s cubic-bezier(.22,1,.36,1);pointer-events:none}
+  .paso:hover::before{left:135%}
   .paso .num{font-family:'Bricolage Grotesque',sans-serif;font-size:.8rem;letter-spacing:.2em;color:var(--teal)}
   .paso h3{margin:16px 0 10px;font-size:1.3rem}
   .paso p{font-size:.95rem;color:var(--muted)}
 
   /* catálogo */
   .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  .prod{padding:28px;position:relative;overflow:hidden;transition:transform var(--transicion), border-color var(--transicion)}
+  .prod{padding:28px;position:relative;overflow:hidden;transition:transform .45s cubic-bezier(.22,1,.36,1), border-color .45s cubic-bezier(.22,1,.36,1)}
   .prod:hover{transform:translateY(-6px);border-color:rgba(220,184,119,.45)}
+  /* Liquid Glass: brillo especular que recorre el vidrio al hover (doctrina Apple: luz que refracta en los controles) */
+  .prod::before{content:"";position:absolute;top:0;left:-75%;width:55%;height:100%;transform:skewX(-18deg);
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.09), transparent);
+    transition:left .65s cubic-bezier(.22,1,.36,1);pointer-events:none}
+  .prod:hover::before{left:135%}
   .prod .ico{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(150deg, rgba(220,184,119,.2), rgba(220,184,119,.06));border:1px solid rgba(220,184,119,.3);color:var(--ambar);margin-bottom:18px}
   .prod h3{font-size:1.12rem;margin-bottom:8px}
   .prod p{font-size:.9rem;color:var(--muted)}
@@ -191,8 +203,8 @@
 
   /* planes */
   .planes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch}
-  .plan{padding:38px 32px;display:flex;flex-direction:column;transition:transform var(--transicion)}
-  .plan:hover{transform:translateY(-6px)}
+  .plan{padding:38px 32px;display:flex;flex-direction:column;transition:transform .45s cubic-bezier(.22,1,.36,1), border-color .45s cubic-bezier(.22,1,.36,1), box-shadow .45s cubic-bezier(.22,1,.36,1)}
+  .plan:hover{transform:translateY(-6px);border-color:rgba(220,184,119,.5);box-shadow:inset 0 1px 0 var(--borde-brillo), 0 30px 70px -30px rgba(220,184,119,.25)}
   .plan.destacado{border-color:rgba(220,184,119,.5);background:linear-gradient(165deg, rgba(220,184,119,.12), rgba(255,255,255,.04) 50%, rgba(255,255,255,.06));position:relative}
   .plan .badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(160deg,#F6E7C1,#A97F3C);color:#171006;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:999px;padding:6px 18px;white-space:nowrap}
   .plan h3{font-size:1.4rem}
