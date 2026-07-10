@@ -582,6 +582,7 @@
   <p>Contanos de tu negocio y te respondemos con el primer paso: el diagnóstico con números tuyos.</p>
 
   <form class="form-card glass" id="form-contacto" novalidate>
+    <input type="text" name="web" id="f-web" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;height:0;opacity:0" aria-hidden="true">
     <div class="campo">
       <label for="f-nombre">Tu nombre *</label>
       <input id="f-nombre" name="nombre" type="text" placeholder="Norma" autocomplete="name" required>
@@ -626,6 +627,7 @@
       NORIA
     </a>
     <p>Agentic as a Service · © 2026 NORIA — Tu empresa girando sola.</p>
+    <p style="display:flex;gap:18px"><a href="/privacidad.html" style="color:var(--muted)">Privacidad</a><a href="/terminos.html" style="color:var(--muted)">Términos</a><a href="mailto:agurovitz@noriacorp.com" style="color:var(--muted)">Contacto</a></p>
   </div>
 </footer>
 
@@ -636,6 +638,9 @@
      pasa a abrir WhatsApp automáticamente en vez del correo. */
   const WHATSAPP = "";
   const EMAIL = "agurovitz@noriacorp.com";
+  // URL del backend (ej: "https://api.noriacorp.com"). Vacío = los envíos salen por
+  // correo (mailto). Al desplegar el backend, completar y el form envía directo.
+  const API = "";
 
   /* Reveals al scrollear */
   const io = new IntersectionObserver((entries)=>{
@@ -698,18 +703,41 @@
       (txtMensaje.value.trim() ? " Mi situación: " + txtMensaje.value.trim() : "");
 
     const btn = document.getElementById('f-enviar');
-    btn.textContent = 'Abriendo…';
+    const ok = document.getElementById('form-ok');
+    btn.textContent = 'Enviando…';
+    const restaurar = () => setTimeout(()=>{ btn.innerHTML = 'Enviar consulta <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'; }, 1600);
+
+    // Con backend desplegado: envío directo (el prospecto no abre nada).
+    if (API) {
+      try {
+        const res = await fetch(API + '/contacto', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            nombre: nombre.value.trim(), negocio: negocio.value.trim(),
+            whatsapp: wsp.value.trim(), interes: selInteres.value,
+            mensaje: txtMensaje.value.trim(), web: document.getElementById('f-web').value
+          })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        ok.textContent = '✓ ¡Recibido! Te respondemos dentro del día por WhatsApp o email.';
+        ok.classList.add('visible');
+        form.reset();
+        restaurar();
+        return;
+      } catch (e) { /* si la API falla, cae al plan B de abajo */ }
+    }
 
     if(WHATSAPP){
       window.open('https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(texto), '_blank');
-      document.getElementById('form-ok').textContent = '✓ ¡Listo! Se abrió WhatsApp con tu consulta armada — tocá enviar y te respondemos dentro del día.';
+      ok.textContent = '✓ ¡Listo! Se abrió WhatsApp con tu consulta armada — tocá enviar y te respondemos dentro del día.';
     } else {
       window.location.href = 'mailto:' + EMAIL +
         '?subject=' + encodeURIComponent('Consulta NORIA — ' + selInteres.value) +
         '&body=' + encodeURIComponent(texto);
     }
-    document.getElementById('form-ok').classList.add('visible');
-    setTimeout(()=>{ btn.innerHTML = 'Enviar consulta <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'; }, 1600);
+    ok.classList.add('visible');
+    restaurar();
   });
 </script>
 </body>
